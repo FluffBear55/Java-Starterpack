@@ -4,6 +4,8 @@ import starterpack.game.*;
 import starterpack.util.Logger;
 import starterpack.util.Utility;
 
+import static starterpack.util.Logger.LOGGER;
+
 public class RushMidStrategy implements Strategy {
 
     /**
@@ -31,13 +33,13 @@ public class RushMidStrategy implements Strategy {
         boolean notInMid = !((playerX == 4 || playerX == 5) && (playerY == 4 || playerY == 5));
 
         // tp home if low
-        if (myPlayerState.getHealth() <=3) {
+        if (myPlayerState.getHealth() <= 3) {
             return Utility.spawnPoints.get(myPlayerIndex);
         }
 
-        // stay put if can buy prost whatever
-        if (myPlayerState.getGold() >= 8 && !(myPlayerState.getItem() == Item.PROCRUSTEAN_IRON)) {
-            return Utility.spawnPoints.get(myPlayerIndex);
+        // stay put if in spawn and can buy proc
+        if ((myPlayerState.getGold() >= 8) && !(myPlayerState.getItem() == Item.PROCRUSTEAN_IRON) && (playerPos == Utility.spawnPoints.get(myPlayerIndex))) {
+            return playerPos;
         }
 
         // move towards mid if not already in mid
@@ -47,7 +49,7 @@ public class RushMidStrategy implements Strategy {
             }
         } else if (myPlayerIndex == 1) {
             if (notInMid) {
-                return new Position(playerX + -1, playerY + 1);
+                return new Position(playerX - 1, playerY + 1);
             }
         } else if (myPlayerIndex == 2) {
             if (notInMid) {
@@ -68,20 +70,24 @@ public class RushMidStrategy implements Strategy {
      * @return
      */
     public int attackActionDecision(GameState gameState, int myPlayerIndex) {
-        int res = 0;
+        // weakest player in range = nobody
+        int weakestInRangeHealth = 99;
+        int weakestInRangeIndex = 0;
+        // for i in range 4
         for (int i = 0; i < 4; i++) {
-
+            // if i is not me
             if (i != myPlayerIndex) {
-                if (Utility.chebyshevDistance(
-                        gameState.getPlayerStateByIndex(myPlayerIndex).getPosition(),
-                        gameState.getPlayerStateByIndex(i).getPosition()) <=
-                        gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass().getStatSet().getRange()) {
-                    return i;
+                int distToTarget = Utility.chebyshevDistance(gameState.getPlayerStateByIndex(myPlayerIndex).getPosition(), gameState.getPlayerStateByIndex(i).getPosition());
+                int myPlayerRange = gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass().getStatSet().getRange();
+                if (distToTarget <= myPlayerRange) {
+                    if (gameState.getPlayerStateByIndex(i).getHealth() < weakestInRangeHealth) {
+                        weakestInRangeIndex = i;
+                        weakestInRangeHealth = gameState.getPlayerStateByIndex(i).getHealth();
+                    }
                 }
-                res = i;
             }
         }
-        return res;
+        return weakestInRangeIndex;
     }
 
     /**
