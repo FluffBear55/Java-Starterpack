@@ -1,9 +1,6 @@
 package starterpack.strategy;
 
-import starterpack.game.GameState;
-import starterpack.game.CharacterClass;
-import starterpack.game.Item;
-import starterpack.game.Position;
+import starterpack.game.*;
 
 public class StarterStrategy implements Strategy {
 
@@ -23,7 +20,8 @@ public class StarterStrategy implements Strategy {
      * @return
      */
     public Position moveActionDecision(GameState gameState, int myPlayerIndex) {
-        return new Position(0, 5);
+        PlayerState playerState = gameState.getPlayerStateByIndex(myPlayerIndex);
+        return new Position(playerState.getPosition().getX(), playerState.getPosition().getY());
     }
 
     /**
