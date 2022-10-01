@@ -36,6 +36,19 @@ public class NewMetaStrategy implements Strategy {
         return false;
     }
 
+    private boolean isInMid(GameState gameState, int playerIndex) {
+
+        PlayerState playerState = gameState.getPlayerStateByIndex(playerIndex);
+        int playerX = playerState.getPosition().getX();
+        int playerY = playerState.getPosition().getY();
+
+        if ((playerX == 4 || playerX == 5) && (playerY == 4 || playerY == 5)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private Position fixBadDestination(Position destination, PlayerState playerState) {
         int speed = playerState.getStatSet().getSpeed();
         int minDistance = 100;
@@ -53,8 +66,20 @@ public class NewMetaStrategy implements Strategy {
         return fixedDestination;
     }
 
+    private boolean isMidOccupied(GameState gameState, int myPlayerIndex) {
+        PlayerState myPlayerState = gameState.getPlayerStateByIndex(myPlayerIndex);
+
+        for (int i = 0; i < 4; i++) {
+            // if i is not me
+            if (i != myPlayerIndex && isInMid(gameState, i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public CharacterClass strategyInitialize(int myPlayerIndex) {
-        return CharacterClass.WIZARD;
+        return CharacterClass.KNIGHT;
     }
     public boolean useActionDecision(GameState gameState, int myPlayerIndex) {
         return false;
@@ -83,31 +108,79 @@ public class NewMetaStrategy implements Strategy {
         if ((myPlayerState.getGold() >= 8) && !(myPlayerState.getItem() == Item.HUNTER_SCOPE) && (inSpawn)) {
             return playerPos;
         }
-        Logger.LOGGER.info("enough gold?: " + (myPlayerState.getGold() >= 8));
-        Logger.LOGGER.info("has scope?: " + (myPlayerState.getItem() == Item.HUNTER_SCOPE));
-        Logger.LOGGER.info("player index: " + myPlayerIndex);
-        Logger.LOGGER.info("pos: " + playerPos);
-        Logger.LOGGER.info("spawn pos: " + Utility.spawnPoints.get(myPlayerIndex));
-        Logger.LOGGER.info("in spawn?: " + inSpawn);
-        // otherwise go to mid
-        Position optimalMidPoint = new Position();
-        switch (myPlayerIndex) {
-            case 0:
-                optimalMidPoint = new Position(4, 4);
-                break;
-            case 1:
-                optimalMidPoint = new Position(5, 4);
-                break;
-            case 2:
-                optimalMidPoint = new Position(5, 5);
-                break;
-            case 3:
-                optimalMidPoint = new Position(4, 5);
-                break;
+        /*
+        // if someone in mid then move such that x = 3 or 6 and y = 3 or 6
+        else if (isMidOccupied(gameState, myPlayerIndex) && notInMid) {
+            Logger.LOGGER.info("dist to x=3: " + Math.abs(3 - playerX));
+            Logger.LOGGER.info("dist to x=6: " + Math.abs(6 - playerX));
+            int diffToX3 = 3 - playerX;
+            int diffToX6 = 6 - playerY;
+            int toMoveX = 0;
+            if (Math.abs(diffToX3) < Math.abs(diffToX6)) {
+                toMoveX = diffToX3;
             }
+            else {
+                toMoveX = diffToX6;
+            }
+
+            Logger.LOGGER.info("dist to y=3: " + Math.abs(3 - playerY));
+            Logger.LOGGER.info("dist to y=6: " + Math.abs(6 - playerY));
+            int diffToY3 = 3 - playerX;
+            int diffToY6 = 6 - playerY;
+            int toMoveY = Math.min(diffToY3, diffToY6);
+
+            if (Math.abs(diffToY3) < Math.abs(diffToY6)) {
+                toMoveY = diffToY3;
+            }
+            else {
+                toMoveY = diffToY6;
+            }
+
+
+            Logger.LOGGER.info("to move X: " + toMoveX);
+            Logger.LOGGER.info("to move Y: " + toMoveY);
+
+            return fixBadDestination(new Position(playerX + toMoveX, playerY + toMoveY), myPlayerState);
+        }
+        */
+        // otherwise go to mid
+        else if (notInMid) {
+            Position thePos = new Position(0, 0);
+            if (myPlayerIndex == 0) {
+                thePos =  new Position(playerX + 1, playerY + 1);
+            } else if (myPlayerIndex == 1) {
+                thePos =  new Position(playerX - 1, playerY + 1);
+            } else if (myPlayerIndex == 2) {
+                thePos =  new Position(playerX - 1, playerY - 1);
+            } else if (myPlayerIndex == 3) {
+                thePos =  new Position(playerX + 1, playerY - 1);
+            }
+            return thePos;
+            /*
+            Position optimalMidPoint = new Position();
+            switch (myPlayerIndex) {
+                case 0:
+                    optimalMidPoint = new Position(4, 4);
+                    break;
+                case 1:
+                    optimalMidPoint = new Position(5, 4);
+                    break;
+                case 2:
+                    optimalMidPoint = new Position(5, 5);
+                    break;
+                case 3:
+                    optimalMidPoint = new Position(4, 5);
+                    break;
+                }
             return fixBadDestination(optimalMidPoint, myPlayerState);
+
+             */
+        }
+        else {
+            return playerPos;
         }
 
+    }
 
     public int attackActionDecision(GameState gameState, int myPlayerIndex) {
         // weakest player in range = nobody
