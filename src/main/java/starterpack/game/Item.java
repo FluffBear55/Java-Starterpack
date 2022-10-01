@@ -36,7 +36,7 @@ public enum Item {
 
     }
   },
-  HUNTER_SCOPE(new StatSet(0, 0, 0, 2), -1, 8) {
+  HUNTER_SCOPE(new StatSet(0, 0, 0, 1), -1, 8) {
     @Override
     public void affect(PlayerState player) {
 
