@@ -8,8 +8,7 @@ public class StrategyConfig {
      * @return A Strategy object.
      */
     public static Strategy getStrategy(int playerIndex) {
-//        if (playerIndex == 0) return new OnlyBuyAndUseShieldStrategy();
-//        else return new OnlyGoto00AndAttackStrategy();
-        return new RushMidStrategy();
+        if (playerIndex == 0) return new RushMidStrategy();
+        else return new AggroAsF();
     }
 }
