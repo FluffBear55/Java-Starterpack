@@ -21,7 +21,7 @@ public class StarterStrategy implements Strategy {
      */
     public Position moveActionDecision(GameState gameState, int myPlayerIndex) {
         PlayerState playerState = gameState.getPlayerStateByIndex(myPlayerIndex);
-        return new Position(playerState.getPosition().getX(), playerState.getPosition().getY());
+        return new Position(playerState.getPosition().getX(), playerState.getPosition().getY()+1);
     }
 
     /**
