@@ -81,6 +81,7 @@ public class NewMetaStrategy implements Strategy {
     public CharacterClass strategyInitialize(int myPlayerIndex) {
         return CharacterClass.KNIGHT;
     }
+
     public boolean useActionDecision(GameState gameState, int myPlayerIndex) {
         return false;
     }
