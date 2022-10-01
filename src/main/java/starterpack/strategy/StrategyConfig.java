@@ -1,7 +1,5 @@
 package starterpack.strategy;
 
-import java.util.Random;
-
 public class StrategyConfig {
 
     /**
@@ -10,8 +8,8 @@ public class StrategyConfig {
      * @return A Strategy object.
      */
     public static Strategy getStrategy(int playerIndex) {
-        if (playerIndex == 0) return new ArcherStrategy();
-        else return new RushMidStrategy();
-//        return new ArcherStrategy();
+//        if (playerIndex == 0) return new NewMetaStrategy();
+//        else return new RushMidStrategy();
+        return new NewMetaStrategy();
     }
 }
