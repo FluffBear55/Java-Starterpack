@@ -42,11 +42,19 @@ public class NewMetaStrategy implements Strategy {
         int playerX = playerState.getPosition().getX();
         int playerY = playerState.getPosition().getY();
 
-        if ((playerX == 4 || playerX == 5) && (playerY == 4 || playerY == 5)) {
-            return true;
-        } else {
-            return false;
+        return (playerX == 4 || playerX == 5) && (playerY == 4 || playerY == 5);
+    }
+
+    private boolean isMidOccupied(GameState gameState, int myPlayerIndex) {
+        PlayerState myPlayerState = gameState.getPlayerStateByIndex(myPlayerIndex);
+
+        for (int i = 0; i < 4; i++) {
+            // if i is not me
+            if (i != myPlayerIndex && isInMid(gameState, i)) {
+                return true;
+            }
         }
+        return false;
     }
 
     private Position fixBadDestination(Position destination, PlayerState playerState) {
@@ -64,18 +72,6 @@ public class NewMetaStrategy implements Strategy {
             }
         }
         return fixedDestination;
-    }
-
-    private boolean isMidOccupied(GameState gameState, int myPlayerIndex) {
-        PlayerState myPlayerState = gameState.getPlayerStateByIndex(myPlayerIndex);
-
-        for (int i = 0; i < 4; i++) {
-            // if i is not me
-            if (i != myPlayerIndex && isInMid(gameState, i)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public CharacterClass strategyInitialize(int myPlayerIndex) {
@@ -207,6 +203,5 @@ public class NewMetaStrategy implements Strategy {
     public Item buyActionDecision(GameState gameState, int myPlayerIndex) {
         return primaryItem;
     }
-
 
 }
