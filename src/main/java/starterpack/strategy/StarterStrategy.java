@@ -23,7 +23,7 @@ public class StarterStrategy implements Strategy {
      * @return
      */
     public Position moveActionDecision(GameState gameState, int myPlayerIndex) {
-        return new Position(0, 0);
+        return new Position(0, 5);
     }
 
     /**
@@ -43,7 +43,8 @@ public class StarterStrategy implements Strategy {
      * @return
      */
     public Item buyActionDecision(GameState gameState, int myPlayerIndex) {
-        return Item.NONE;
+
+        return Item.MAGIC_STAFF;
     }
 
     /**

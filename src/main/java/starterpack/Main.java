@@ -175,6 +175,6 @@ public class Main {
         }
 
         client.disconnect();
-        LOGGER.info("Completed! Check your output at Engine\\gamelogs.");
+        LOGGER.info("Completed! Check your output at Engine\\gamelogs!!! WOW");
     }
 }

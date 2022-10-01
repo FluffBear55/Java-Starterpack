@@ -18,7 +18,7 @@ We have provided some useful stuff in the `starterpack.util` package. `Utility` 
 
 Finally, compile your bot by using `./gradlew build`, `./gradlew.bat build` or `sh ./gradlew` and you will find the executable jar under `build/libs`. Run any number of bots using
 
-`java -jar path/to/jar <player_number>` or `./start-4-java-bots.bat` (this is a development byproduct so sorry mac users), which run 4 copies of your bot
+`java -jar path/to/jar <player_number>` or the windows helper script (this is a byproduct of devloping so sorry mac users) `./start-4-java-bots.bat`, which run 4 copies of your bot
 
 alongside [Engine](https://github.com/MechMania-28/Engine) to test them out, and use `mm push` (TODO) to submit to the tournament!
 
