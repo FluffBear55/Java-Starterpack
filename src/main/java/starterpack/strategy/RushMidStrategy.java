@@ -90,7 +90,7 @@ public class RushMidStrategy implements Strategy {
             // if i is not me
             if (i != myPlayerIndex) {
                 int distToTarget = Utility.chebyshevDistance(gameState.getPlayerStateByIndex(myPlayerIndex).getPosition(), gameState.getPlayerStateByIndex(i).getPosition());
-                int myPlayerRange = gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass().getStatSet().getRange();
+                int myPlayerRange = gameState.getPlayerStateByIndex(myPlayerIndex).getStatSet().getRange();
                 if (distToTarget <= myPlayerRange) {
                     if (gameState.getPlayerStateByIndex(i).getHealth() < weakestInRangeHealth) {
                         weakestInRangeIndex = i;
