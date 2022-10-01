@@ -4,6 +4,7 @@ import starterpack.game.GameState;
 import starterpack.game.CharacterClass;
 import starterpack.game.Item;
 import starterpack.game.Position;
+import starterpack.util.Logger;
 
 public class RushMidStrategy implements Strategy {
 
@@ -24,10 +25,15 @@ public class RushMidStrategy implements Strategy {
      */
     public Position moveActionDecision(GameState gameState, int myPlayerIndex) {
         Position playerPos = gameState.getPlayerStateByIndex(myPlayerIndex).getPosition();
+        int playerX = playerPos.getX();
+        int playerY = playerPos.getY();
+
         if (myPlayerIndex == 0) {
-            return new Position(playerPos.getX()+1, playerPos.getY()+1);
+            if (!((playerX == 5 || playerX == 6) && (playerY == 5 || playerY == 6))) {
+                return new Position(playerPos.getX()+1, playerPos.getY()+1);
+            }
         }
-        else return gameState.getPlayerStateByIndex(myPlayerIndex).getPosition();
+        return gameState.getPlayerStateByIndex(myPlayerIndex).getPosition();
     }
 
     /**
