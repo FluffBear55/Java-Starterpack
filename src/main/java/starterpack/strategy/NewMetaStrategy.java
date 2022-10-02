@@ -79,6 +79,9 @@ public class NewMetaStrategy implements Strategy {
     }
 
     public boolean useActionDecision(GameState gameState, int myPlayerIndex) {
+        if (gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass() != CharacterClass.ARCHER) {
+            return true;
+        }
         return false;
     }
 
@@ -94,66 +97,30 @@ public class NewMetaStrategy implements Strategy {
         boolean inDanger = isInDanger(gameState, myPlayerIndex);
         boolean inSpawn = (playerPos.getX() == spawnPos.getX() && playerPos.getY() == spawnPos.getY());
 
-        /*
-        // tp home if in danger
-        if (inDanger) {
-            return Utility.spawnPoints.get(myPlayerIndex);
-        }
-         */
-
-        // stay in spawn if can buy item
-        if ((myPlayerState.getGold() >= 8) && !(myPlayerState.getItem() == Item.HUNTER_SCOPE) && (inSpawn)) {
-            return playerPos;
-        }
-        /*
-        // if someone in mid then move such that x = 3 or 6 and y = 3 or 6
-        else if (isMidOccupied(gameState, myPlayerIndex) && notInMid) {
-            Logger.LOGGER.info("dist to x=3: " + Math.abs(3 - playerX));
-            Logger.LOGGER.info("dist to x=6: " + Math.abs(6 - playerX));
-            int diffToX3 = 3 - playerX;
-            int diffToX6 = 6 - playerY;
-            int toMoveX = 0;
-            if (Math.abs(diffToX3) < Math.abs(diffToX6)) {
-                toMoveX = diffToX3;
+        if (myPlayerState.getCharacterClass() == CharacterClass.KNIGHT) {
+            // stay in spawn if can buy item
+            if ((myPlayerState.getGold() >= 8) && !(myPlayerState.getItem() == Item.HUNTER_SCOPE) && (inSpawn)) {
+                return playerPos;
+            }
+            // otherwise go to mid
+            else if (notInMid) {
+                Position thePos = new Position(0, 0);
+                if (myPlayerIndex == 0) {
+                    thePos =  new Position(playerX + 1, playerY + 1);
+                } else if (myPlayerIndex == 1) {
+                    thePos =  new Position(playerX - 1, playerY + 1);
+                } else if (myPlayerIndex == 2) {
+                    thePos =  new Position(playerX - 1, playerY - 1);
+                } else if (myPlayerIndex == 3) {
+                    thePos =  new Position(playerX + 1, playerY - 1);
+                }
+                return thePos;
             }
             else {
-                toMoveX = diffToX6;
+                return playerPos;
             }
-
-            Logger.LOGGER.info("dist to y=3: " + Math.abs(3 - playerY));
-            Logger.LOGGER.info("dist to y=6: " + Math.abs(6 - playerY));
-            int diffToY3 = 3 - playerX;
-            int diffToY6 = 6 - playerY;
-            int toMoveY = Math.min(diffToY3, diffToY6);
-
-            if (Math.abs(diffToY3) < Math.abs(diffToY6)) {
-                toMoveY = diffToY3;
-            }
-            else {
-                toMoveY = diffToY6;
-            }
-
-
-            Logger.LOGGER.info("to move X: " + toMoveX);
-            Logger.LOGGER.info("to move Y: " + toMoveY);
-
-            return fixBadDestination(new Position(playerX + toMoveX, playerY + toMoveY), myPlayerState);
         }
-        */
-        // otherwise go to mid
-        else if (notInMid) {
-            Position thePos = new Position(0, 0);
-            if (myPlayerIndex == 0) {
-                thePos =  new Position(playerX + 1, playerY + 1);
-            } else if (myPlayerIndex == 1) {
-                thePos =  new Position(playerX - 1, playerY + 1);
-            } else if (myPlayerIndex == 2) {
-                thePos =  new Position(playerX - 1, playerY - 1);
-            } else if (myPlayerIndex == 3) {
-                thePos =  new Position(playerX + 1, playerY - 1);
-            }
-            return thePos;
-            /*
+        else if (myPlayerState.getCharacterClass() == CharacterClass.ARCHER) {
             Position optimalMidPoint = new Position();
             switch (myPlayerIndex) {
                 case 0:
@@ -168,39 +135,64 @@ public class NewMetaStrategy implements Strategy {
                 case 3:
                     optimalMidPoint = new Position(4, 5);
                     break;
-                }
+            }
             return fixBadDestination(optimalMidPoint, myPlayerState);
-
-             */
         }
-        else {
-            return playerPos;
-        }
-
+        return new Position(0, 0);
     }
 
     public int attackActionDecision(GameState gameState, int myPlayerIndex) {
-        // weakest player in range = nobody
-        int weakestInRangeHealth = 99;
-        int weakestInRangeIndex = 0;
+        if (gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass() == CharacterClass.ARCHER) {
+            int currentBestPlayerIndex = 0;
+            for (int i = 0; i < 4; i++) {
+                // if i is not me
+                if (i != myPlayerIndex) {
+                    int distToTarget = Utility.chebyshevDistance(gameState.getPlayerStateByIndex(myPlayerIndex).getPosition(), gameState.getPlayerStateByIndex(i).getPosition());
+                    int myPlayerRange = gameState.getPlayerStateByIndex(myPlayerIndex).getStatSet().getRange();
+                    if ((distToTarget <= myPlayerRange) && gameState.getPlayerStateByIndex(i).getScore() >= gameState.getPlayerStateByIndex(currentBestPlayerIndex).getScore()) {
+                        currentBestPlayerIndex = i;
+                    }
+                }
+            }
+            return currentBestPlayerIndex;
+        }
+        else if (gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass() == CharacterClass.KNIGHT) {
+            // weakest player in range = nobody
+            int weakestInRangeHealth = 99;
+            int weakestInRangeIndex = 0;
+            // for i in range 4
+            for (int i = 0; i < 4; i++) {
+                // if i is not me
+                if (i != myPlayerIndex) {
+                    int distToTarget = Utility.chebyshevDistance(gameState.getPlayerStateByIndex(myPlayerIndex).getPosition(), gameState.getPlayerStateByIndex(i).getPosition());
+                    int myPlayerRange = gameState.getPlayerStateByIndex(myPlayerIndex).getStatSet().getRange();
+                    if (distToTarget <= myPlayerRange) {
+                        if (gameState.getPlayerStateByIndex(i).getHealth() < weakestInRangeHealth) {
+                            weakestInRangeIndex = i;
+                            weakestInRangeHealth = gameState.getPlayerStateByIndex(i).getHealth();
+                        }
+                    }
+                }
+            }
+            return weakestInRangeIndex;
+        }
+        return 0;
+    }
+
+    public Item buyActionDecision(GameState gameState, int myPlayerIndex) {
+        int knightCount = 0;
         // for i in range 4
         for (int i = 0; i < 4; i++) {
             // if i is not me
             if (i != myPlayerIndex) {
-                int distToTarget = Utility.chebyshevDistance(gameState.getPlayerStateByIndex(myPlayerIndex).getPosition(), gameState.getPlayerStateByIndex(i).getPosition());
-                int myPlayerRange = gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass().getStatSet().getRange();
-                if (distToTarget <= myPlayerRange) {
-                    if (gameState.getPlayerStateByIndex(i).getHealth() < weakestInRangeHealth) {
-                        weakestInRangeIndex = i;
-                        weakestInRangeHealth = gameState.getPlayerStateByIndex(i).getHealth();
-                    }
+                if (gameState.getPlayerStateByIndex(i).getCharacterClass() == CharacterClass.KNIGHT) {
+                    knightCount++;
                 }
             }
         }
-        return weakestInRangeIndex;
-    }
-
-    public Item buyActionDecision(GameState gameState, int myPlayerIndex) {
+        if (knightCount >= 2 && (gameState.getPlayerStateByIndex(myPlayerIndex).getCharacterClass() != CharacterClass.ARCHER)) {
+            return Item.STEEL_TIPPED_ARROW;
+        }
         return primaryItem;
     }
 
